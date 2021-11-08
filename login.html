@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+     
+       #signup-form , login-form {width:20px;margin-left:5%;}
+       input{margin-top:3px;}
+
+        #signup {
+            display:none;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="forms">
+    <div id="signup">
+<form onsubmit="signup(event)" id="signup-form">
+    <h1>Signup</h1>
+        <input type="text" id="name" placeholder="Name"/>
+        <input type="email" id="email" placeholder="Email"/>
+        <input type="text" id = "username" placeholder="username"/>
+        <input type="password" id="password" placeholder="Password"/>
+        <input type="number" id="mobile" placeholder="Mobile number"/>
+        <input type="text" id="description" placeholder="Description"/>
+        <input type="submit"/>
+
+    </form>
+    </div>
+    <div id="login">
+    <form id="login-form" onsubmit="login(event)">
+        <h1>Login</h1>
+        <input type="text" id="user" placeholder="username" >
+        <input type="password" id="pass" placeholder="password" >
+        <input type="submit" >
+
+    </form>
+</div>
+</div>
+
+</body>
+</html>
+<script>
+
+function signup(e){  // creating a function  signup that will be called when the user clicks on the signup form
+
+    e.preventDefault() // its important to prevent the browser from submitting because iska default aadat h submit karna
+     let form = document.getElementById('signup-form') // creating a form here in javascript
+
+     let user_data = {
+         name: form.name.value, // getting the name of the user from the html from 
+         email: form.email.value,
+         username: form.username.value,
+         password: form.password.value,
+         mobile: form.mobile.value,
+         description: form.description.value,
+     }
+     //console.log(user_data); // checking in the console if all is going right or not
+
+     user_data = JSON.stringify(user_data) // converting to JSON format because internet wont understand object format
+
+    
+     fetch(`https://masai-api-mocker.herokuapp.com/auth/register`, {
+
+        method: "POST", // the method to be called
+
+        body: user_data, // sending the data to the server but before sending we need to stringify it
+
+
+        headers: {
+
+            'content-type': 'application/json' // additional information about the  type of data we are sending to the server
+        },
+
+        
+     })
+     .then((res)=>{ // collected the response
+        
+        return res.json(); // return the collected data in json format 
+     })
+     .then((res)=>{  // thats a promise response
+         console.log(res);
+     })
+     .catch((err)=>{  // catch any errors
+         console.log(err); //showing the error message
+    })
+     }
+   
+
+function login(e){ // creating a login function,
+
+    e.preventDefault(); // prevent
+
+    let form = document.getElementById('login-form')
+     let user_data = {
+         username: form.user.value, // getting the username valued=s from the id user.,
+         password : form.pass.value,
+     }
+     let data_to_send = JSON.stringify(user_data)
+    //  console.log(data_to_send);
+
+fetch(`https://masai-api-mocker.herokuapp.com/auth/login`,{
+
+method: 'POST',
+
+body:data_to_send,
+
+headers: { 'Content-Type': 'application/json'},
+
+})
+.then((res)=>{ // collected the response
+        
+        return res.json(); // return the collected data in json format
+         
+     })
+     .then((res)=>{  // thats a promise response
+         console.log(res);
+
+         fetchMyData(user_data.username, res.token); //
+
+
+     })
+     .catch((err)=>{  // catch any errors
+         console.log(err); //showing the error message
+    })
+}
+
+function fetchMyData(username,token){ // 
+
+    fetch(`https://masai-api-mocker.herokuapp.com/user/${username}`,{
+    headers :{
+        "content-type": "application/json",
+        "Authorization": `Bearer ${token}`
+    }
+})
+.then((res)=>{ // collected the response
+        
+        return res.json(); // return the collected data in json format 
+     })
+     .then((res)=>{  // thats a promise response
+         //console.log(res.username);
+         go_to_home(res.username)
+     })
+     .catch((err)=>{  // catch any errors
+         console.log(err); //showing the error message
+    })
+}
+
+  function go_to_home(user){
+      let xxx = document.getElementById("user").value
+   if(xxx == user) {
+    localStorage.setItem("name",JSON.stringify(xxx))
+    window.location.href = "index.html"; //
+    
+   } else {
+       alert("You are Noob, you can try again");
+   }
+}
+// go_to_home()
+</script>
